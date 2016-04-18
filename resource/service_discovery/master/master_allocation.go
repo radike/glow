@@ -40,49 +40,49 @@ func (tl *TeamMaster) allocateServersOnRack(dc *resource.DataCenter, rack *resou
 			}
 			request := requests[j]
 
+			// fmt.Printf("available %v, requested %v\n", available, request.ComputeResource)
+
 			if request.ComputeResource.RequiredResource != "" {
 				// pick agent with the specified resource
-				agentWithFileAllocated := false
-				for _, agentWithFile := range rack.GetAgents() {
-					available := agentWithFile.Resource.Minus(agentWithFile.Allocated)
-					if agentWithFile.ArbitraryResources == request.ComputeResource.RequiredResource && available.GreaterThanZero() && available.Covers(request.ComputeResource) {
-						allocated = append(allocated, resource.Allocation{
-							Location:  agentWithFile.Location,
-							Allocated: request.ComputeResource,
-							ProvidedResources: agentWithFile.ArbitraryResources,
-						})
-						agentWithFile.Allocated = agentWithFile.Allocated.Plus(request.ComputeResource)
-						rack.Allocated = rack.Allocated.Plus(request.ComputeResource)
-						dc.Allocated = dc.Allocated.Plus(request.ComputeResource)
-						tl.MasterResource.Topology.Allocated = tl.MasterResource.Topology.Allocated.Plus(request.ComputeResource)
-						available = available.Minus(request.ComputeResource)
-						agentWithFileAllocated = true
-						break
-					}
+				agentWithResource := getAgentWithRequiredResource(request.ComputeResource, rack)
+				if agentWithResource != nil {
+					allocated = append(allocated, tl.allocateRequest(request, agentWithResource, rack, dc))
+					available = available.Minus(request.ComputeResource)
+					hasAllocation = true
 				}
-				if !agentWithFileAllocated {
-					remainingRequests = append(remainingRequests, request)
-				}
-				continue
-			}
-			// fmt.Printf("available %v, requested %v\n", available, request.ComputeResource)
-			if available.Covers(request.ComputeResource) {
-				allocated = append(allocated, resource.Allocation{
-					Location:  agent.Location,
-					Allocated: request.ComputeResource,
-				})
-				agent.Allocated = agent.Allocated.Plus(request.ComputeResource)
-				rack.Allocated = rack.Allocated.Plus(request.ComputeResource)
-				dc.Allocated = dc.Allocated.Plus(request.ComputeResource)
-				tl.MasterResource.Topology.Allocated = tl.MasterResource.Topology.Allocated.Plus(request.ComputeResource)
+			} else if available.Covers(request.ComputeResource) {
+				allocated = append(allocated, tl.allocateRequest(request, agent, rack, dc))
 				available = available.Minus(request.ComputeResource)
 				hasAllocation = true
-			} else {
+			}
+			if !hasAllocation {
 				remainingRequests = append(remainingRequests, request)
 			}
 		}
 	}
 	return
+}
+
+func getAgentWithRequiredResource(resource resource.ComputeResource, rack *resource.Rack) *resource.AgentInformation {
+	for _, agent := range rack.GetAgents() {
+		available := agent.Resource.Minus(agent.Allocated)
+		if available.GreaterThanZero() && agent.ArbitraryResources == resource.RequiredResource && available.Covers(resource) {
+			return agent
+		}
+	}
+	return nil
+}
+
+func (tl *TeamMaster) allocateRequest(request *resource.ComputeRequest, agent *resource.AgentInformation, rack *resource.Rack, dc *resource.DataCenter) resource.Allocation {
+	agent.Allocated = agent.Allocated.Plus(request.ComputeResource)
+	rack.Allocated = rack.Allocated.Plus(request.ComputeResource)
+	dc.Allocated = dc.Allocated.Plus(request.ComputeResource)
+	tl.MasterResource.Topology.Allocated = tl.MasterResource.Topology.Allocated.Plus(request.ComputeResource)
+	return resource.Allocation{
+		Location:          agent.Location,
+		Allocated:         request.ComputeResource,
+		ProvidedResources: agent.ArbitraryResources,
+	}
 }
 
 func (tl *TeamMaster) findServers(dc *resource.DataCenter, req *resource.AllocationRequest) (ret []resource.Allocation) {
