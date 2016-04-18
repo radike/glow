@@ -9,14 +9,14 @@ import (
 )
 
 type ComputeResource struct {
-	CPUCount int    `json:"cpuCount,omitempty"`
-	CPULevel int    `json:"cpuLevel,omitempty"` // higher number means higher compute power
-	MemoryMB int64  `json:"memoryMB,omitempty"`
-	Files    string `json:"files,omitempty"`
+	CPUCount         int    `json:"cpuCount,omitempty"`
+	CPULevel         int    `json:"cpuLevel,omitempty"` // higher number means higher compute power
+	MemoryMB         int64  `json:"memoryMB,omitempty"`
+	RequiredResource string `json:"resources,omitempty"` //TODO: ComputeResource should not be used by agents and drivers to propagate provided, resp. required, resources
 }
 
 func (a ComputeResource) String() string {
-	return fmt.Sprintf("CPUCount %d Level %d Memory %d MB", a.CPUCount, a.CPULevel, a.MemoryMB)
+	return fmt.Sprintf("CPUCount %d Level %d Memory %d MB '%s' are required", a.CPUCount, a.CPULevel, a.MemoryMB, a.RequiredResource)
 }
 
 func (a ComputeResource) Minus(b ComputeResource) ComputeResource {
@@ -65,12 +65,12 @@ type Location struct {
 	Rack       string `json:"rack,omitempty"`
 	Server     string `json:"server,omitempty"`
 	Port       int    `json:"port,omitempty"`
-	Files      string `json:"files,omitempty"`
 }
 
 type Allocation struct {
-	Location  Location        `json:"location,omitempty"`
-	Allocated ComputeResource `json:"allocated,omitempty"`
+	Location          Location        `json:"location,omitempty"`
+	Allocated         ComputeResource `json:"allocated,omitempty"`
+	ProvidedResources string          `json:"files,omitempty"`
 }
 
 type AllocationRequest struct {

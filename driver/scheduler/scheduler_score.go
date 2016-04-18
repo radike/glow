@@ -7,7 +7,8 @@ import (
 )
 
 func (s *Scheduler) Score(r market.Requirement, bid float64, obj market.Object) float64 {
-	tg, loc := r.(*plan.TaskGroup), obj.(resource.Allocation).Location
+	al := obj.(resource.Allocation)
+	tg, loc := r.(*plan.TaskGroup), al.Location
 	firstTask := tg.Tasks[0]
 	cost := float64(1)
 	for _, input := range firstTask.Inputs {
@@ -16,7 +17,7 @@ func (s *Scheduler) Score(r market.Requirement, bid float64, obj market.Object) 
 			// log.Printf("Strange1: %s not allocated yet.", input.Name())
 			continue
 		}
-		if tg.Files != loc.Files {
+		if tg.RequiredResource != al.ProvidedResources {
 			cost += 10000
 		}
 		cost += dataLocation.Distance(loc)

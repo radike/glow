@@ -8,12 +8,12 @@ import (
 )
 
 type TaskGroup struct {
-	Id              int
-	Tasks           []*flow.Task
-	Parents         []*TaskGroup
-	ParentStepGroup *StepGroup
-	RequestId       uint32 // id for actual request when running
-	Files           string
+	Id               int
+	Tasks            []*flow.Task
+	Parents          []*TaskGroup
+	ParentStepGroup  *StepGroup
+	RequestId        uint32 // id for actual request when running
+	RequiredResource string
 }
 
 type StepGroup struct {
@@ -132,7 +132,7 @@ func translateToTaskGroups(stepId2StepGroup []*StepGroup) (ret []*TaskGroup) {
 			stepGroup.TaskGroups = append(stepGroup.TaskGroups, tg)
 			tg.Id = len(ret)
 			if len(tg.Tasks) > 0 && tg.Tasks[0].Step.Name == "Map" && len(stepGroup.Steps) > 0 && len(stepGroup.Steps[0].Inputs) > 0 && len(stepGroup.Steps[0].Inputs[0].Shards) > 0 {
-				tg.Files = stepGroup.Steps[0].Inputs[0].Shards[i].RemoteFile
+				tg.RequiredResource = stepGroup.Steps[0].Inputs[0].Shards[i].RequiredResource
 			}
 			ret = append(ret, tg)
 		}

@@ -22,10 +22,10 @@ func (s *Scheduler) Fetch(demands []market.Demand) {
 		demand := d.Requirement.(*plan.TaskGroup)
 		request.Requests = append(request.Requests, resource.ComputeRequest{
 			ComputeResource: resource.ComputeResource{
-				CPUCount: 1,
-				CPULevel: 1,
-				MemoryMB: int64(s.Option.TaskMemoryMB),
-				Files:    demand.Files,
+				CPUCount:         1,
+				CPULevel:         1,
+				MemoryMB:         int64(s.Option.TaskMemoryMB),
+				RequiredResource: demand.RequiredResource,
 			},
 			Inputs: s.findTaskGroupInputs(demand),
 		})

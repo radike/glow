@@ -48,13 +48,14 @@ func (fc *FlowContext) Source(f interface{}, shard int) (ret *Dataset) {
 	return
 }
 
-func (fc *FlowContext) Files(f interface{}, files []string) (ret *Dataset) {
-	if len(files) == 0 {
-		panic("empty files")
+func (fc *FlowContext) WithResources(f interface{}, resources []string) (ret *Dataset) {
+	shard := len(resources)
+	if shard == 0 {
+		panic("empty resources")
 	}
-	ret = fc.newNextDatasetFromRemoteFiles(files, guessFunctionOutputType(f))
+	ret = fc.newNextDatasetFromRemoteFiles(resources, guessFunctionOutputType(f))
 	step := fc.AddOneToAllStep(nil, ret)
-	step.Name = "Files"
+	step.Name = "WithResources"
 	step.Function = func(task *Task) {
 		ctype := reflect.ChanOf(reflect.BothDir, ret.Type)
 		outChan := reflect.MakeChan(ctype, 0)

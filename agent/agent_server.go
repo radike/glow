@@ -25,18 +25,18 @@ import (
 )
 
 type AgentServerOption struct {
-	Master       *string
-	Host         *string
-	Port         *int
-	Dir          *string
-	DataCenter   *string
-	Rack         *string
-	MaxExecutor  *int
-	MemoryMB     *int64
-	CPULevel     *int
-	CleanRestart *bool
-	CertFiles    netchan.CertFiles
-	Files        *string
+	Master            *string
+	Host              *string
+	Port              *int
+	Dir               *string
+	DataCenter        *string
+	Rack              *string
+	MaxExecutor       *int
+	MemoryMB          *int64
+	CPULevel          *int
+	CleanRestart      *bool
+	CertFiles         netchan.CertFiles
+	ProvidedResources *string
 }
 
 type AgentServer struct {
@@ -117,7 +117,7 @@ func (as *AgentServer) Run() {
 		resource.AddToValues(values, as.computeResource, as.allocatedResource)
 		values.Add("dataCenter", *as.Option.DataCenter)
 		values.Add("rack", *as.Option.Rack)
-		values.Add("files", *as.Option.Files)
+		values.Add("resources", *as.Option.ProvidedResources)
 	})
 
 	for {

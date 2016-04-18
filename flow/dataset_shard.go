@@ -17,9 +17,9 @@ type DatasetShard struct {
 	ReadyTime time.Time
 	CloseTime time.Time
 
-	lock         sync.RWMutex
-	readingChans []chan reflect.Value
-	RemoteFile   string
+	lock             sync.RWMutex
+	readingChans     []chan reflect.Value
+	RequiredResource string
 }
 
 func (d *Dataset) SetupShard(n int) {
@@ -35,14 +35,14 @@ func (d *Dataset) SetupShard(n int) {
 	}
 }
 
-func (d *Dataset) SetupShardFromRemoteFiles(remFiles []string) {
+func (d *Dataset) SetupShardFromRemoteFiles(requiredResources []string) {
 	ctype := reflect.ChanOf(reflect.BothDir, d.Type)
-	for i := 0; i < len(remFiles); i++ {
+	for i := 0; i < len(requiredResources); i++ {
 		ds := &DatasetShard{
-			Id:         i,
-			Parent:     d,
-			WriteChan:  reflect.MakeChan(ctype, 64), // a buffered chan!
-			RemoteFile: remFiles[i],
+			Id:               i,
+			Parent:           d,
+			WriteChan:        reflect.MakeChan(ctype, 64), // a buffered chan!
+			RequiredResource: requiredResources[i],
 		}
 		// println("created shard", ds.Name())
 		d.Shards = append(d.Shards, ds)

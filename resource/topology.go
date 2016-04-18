@@ -6,10 +6,11 @@ import (
 )
 
 type AgentInformation struct {
-	Location      Location
-	LastHeartBeat time.Time
-	Resource      ComputeResource
-	Allocated     ComputeResource
+	Location           Location
+	LastHeartBeat      time.Time
+	Resource           ComputeResource
+	Allocated          ComputeResource
+	ArbitraryResources string
 }
 
 type Rack struct {

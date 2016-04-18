@@ -40,15 +40,16 @@ func (tl *TeamMaster) allocateServersOnRack(dc *resource.DataCenter, rack *resou
 			}
 			request := requests[j]
 
-			if request.ComputeResource.Files != "" {
+			if request.ComputeResource.RequiredResource != "" {
 				// pick agent with the specified resource
 				agentWithFileAllocated := false
 				for _, agentWithFile := range rack.GetAgents() {
 					available := agentWithFile.Resource.Minus(agentWithFile.Allocated)
-					if agentWithFile.Location.Files == request.ComputeResource.Files && available.GreaterThanZero() && available.Covers(request.ComputeResource) {
+					if agentWithFile.ArbitraryResources == request.ComputeResource.RequiredResource && available.GreaterThanZero() && available.Covers(request.ComputeResource) {
 						allocated = append(allocated, resource.Allocation{
 							Location:  agentWithFile.Location,
 							Allocated: request.ComputeResource,
+							ProvidedResources: agentWithFile.ArbitraryResources,
 						})
 						agentWithFile.Allocated = agentWithFile.Allocated.Plus(request.ComputeResource)
 						rack.Allocated = rack.Allocated.Plus(request.ComputeResource)

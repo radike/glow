@@ -58,12 +58,12 @@ func (tl *TeamMaster) updateAgentHandler(w http.ResponseWriter, r *http.Request)
 		Location: resource.Location{
 			DataCenter: r.FormValue("dataCenter"),
 			Rack:       r.FormValue("rack"),
-			Files:      r.FormValue("files"),
 			Server:     host,
 			Port:       servicePort,
 		},
-		Resource:  res,
-		Allocated: alloc,
+		Resource:           res,
+		Allocated:          alloc,
+		ArbitraryResources: r.FormValue("resources"),
 	}
 
 	// fmt.Printf("reported allocated: %v\n", alloc)
