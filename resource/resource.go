@@ -9,9 +9,10 @@ import (
 )
 
 type ComputeResource struct {
-	CPUCount int   `json:"cpuCount,omitempty"`
-	CPULevel int   `json:"cpuLevel,omitempty"` // higher number means higher compute power
-	MemoryMB int64 `json:"memoryMB,omitempty"`
+	CPUCount int    `json:"cpuCount,omitempty"`
+	CPULevel int    `json:"cpuLevel,omitempty"` // higher number means higher compute power
+	MemoryMB int64  `json:"memoryMB,omitempty"`
+	Files    string `json:"files,omitempty"`
 }
 
 func (a ComputeResource) String() string {
@@ -64,6 +65,7 @@ type Location struct {
 	Rack       string `json:"rack,omitempty"`
 	Server     string `json:"server,omitempty"`
 	Port       int    `json:"port,omitempty"`
+	Files      string `json:"files,omitempty"`
 }
 
 type Allocation struct {

@@ -34,6 +34,7 @@ var (
 		Master:       agent.Flag("master", "master address").Default("localhost:8930").String(),
 		DataCenter:   agent.Flag("dataCenter", "data center name").Default("defaultDataCenter").String(),
 		Rack:         agent.Flag("rack", "rack name").Default("defaultRack").String(),
+		Files:        agent.Flag("files", "offered files").Default("").String(),
 		MaxExecutor:  agent.Flag("max.executors", "upper limit of executors").Default(strconv.Itoa(runtime.NumCPU())).Int(),
 		CPULevel:     agent.Flag("cpu.level", "relative computing power of single cpu core").Default("1").Int(),
 		MemoryMB:     agent.Flag("memory", "memory size in MB").Default("1024").Int64(),

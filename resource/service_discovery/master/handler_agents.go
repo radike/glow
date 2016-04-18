@@ -58,6 +58,7 @@ func (tl *TeamMaster) updateAgentHandler(w http.ResponseWriter, r *http.Request)
 		Location: resource.Location{
 			DataCenter: r.FormValue("dataCenter"),
 			Rack:       r.FormValue("rack"),
+			Files:      r.FormValue("files"),
 			Server:     host,
 			Port:       servicePort,
 		},

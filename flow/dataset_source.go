@@ -48,6 +48,48 @@ func (fc *FlowContext) Source(f interface{}, shard int) (ret *Dataset) {
 	return
 }
 
+func (fc *FlowContext) Files(f interface{}, files []string) (ret *Dataset) {
+	if len(files) == 0 {
+		panic("empty files")
+	}
+	ret = fc.newNextDatasetFromRemoteFiles(files, guessFunctionOutputType(f))
+	step := fc.AddOneToAllStep(nil, ret)
+	step.Name = "Files"
+	step.Function = func(task *Task) {
+		ctype := reflect.ChanOf(reflect.BothDir, ret.Type)
+		outChan := reflect.MakeChan(ctype, 0)
+		fn := reflect.ValueOf(f)
+		var wg sync.WaitGroup
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			defer outChan.Close()
+			fn.Call([]reflect.Value{outChan})
+		}()
+
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+
+			var t reflect.Value
+			i := 0
+			for ok := true; ok; {
+				if t, ok = outChan.Recv(); ok {
+					task.Outputs[i].WriteChan.Send(t)
+					i++
+					if i == shard {
+						i = 0
+					}
+				}
+			}
+		}()
+
+		wg.Wait()
+
+	}
+	return
+}
+
 func (fc *FlowContext) TextFile(fname string, shard int) (ret *Dataset) {
 	fn := func(out chan string) {
 		file, err := os.Open(fname)

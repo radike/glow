@@ -25,6 +25,7 @@ func (s *Scheduler) Fetch(demands []market.Demand) {
 				CPUCount: 1,
 				CPULevel: 1,
 				MemoryMB: int64(s.Option.TaskMemoryMB),
+				Files:    demand.Files,
 			},
 			Inputs: s.findTaskGroupInputs(demand),
 		})

@@ -19,6 +19,7 @@ type DatasetShard struct {
 
 	lock         sync.RWMutex
 	readingChans []chan reflect.Value
+	RemoteFile   string
 }
 
 func (d *Dataset) SetupShard(n int) {
@@ -28,6 +29,20 @@ func (d *Dataset) SetupShard(n int) {
 			Id:        i,
 			Parent:    d,
 			WriteChan: reflect.MakeChan(ctype, 64), // a buffered chan!
+		}
+		// println("created shard", ds.Name())
+		d.Shards = append(d.Shards, ds)
+	}
+}
+
+func (d *Dataset) SetupShardFromRemoteFiles(remFiles []string) {
+	ctype := reflect.ChanOf(reflect.BothDir, d.Type)
+	for i := 0; i < len(remFiles); i++ {
+		ds := &DatasetShard{
+			Id:         i,
+			Parent:     d,
+			WriteChan:  reflect.MakeChan(ctype, 64), // a buffered chan!
+			RemoteFile: remFiles[i],
 		}
 		// println("created shard", ds.Name())
 		d.Shards = append(d.Shards, ds)

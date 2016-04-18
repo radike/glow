@@ -30,6 +30,14 @@ func (fc *FlowContext) newNextDataset(shardSize int, dType reflect.Type) (ret *D
 	return
 }
 
+func (fc *FlowContext) newNextDatasetFromRemoteFiles(remoteFiles []string, dType reflect.Type) (ret *Dataset) {
+	ret = NewDataset(fc, dType)
+	if dType != nil {
+		ret.SetupShardFromRemoteFiles(remoteFiles)
+	}
+	return
+}
+
 func (fc *FlowContext) NewStep() (step *Step) {
 	step = &Step{Id: len(fc.Steps)}
 	fc.Steps = append(fc.Steps, step)

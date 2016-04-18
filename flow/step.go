@@ -5,12 +5,13 @@ import (
 )
 
 type Step struct {
-	Id       int
-	Inputs   []*Dataset
-	Output   *Dataset
-	Function func(*Task)
-	Tasks    []*Task
-	Name     string
+	Id           int
+	Inputs       []*Dataset
+	Output       *Dataset
+	Function     func(*Task)
+	Tasks        []*Task
+	Name         string
+	RequireFiles string
 }
 
 func (s *Step) RunStep() {

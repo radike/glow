@@ -16,6 +16,9 @@ func (s *Scheduler) Score(r market.Requirement, bid float64, obj market.Object) 
 			// log.Printf("Strange1: %s not allocated yet.", input.Name())
 			continue
 		}
+		if tg.Files != loc.Files {
+			cost += 10000
+		}
 		cost += dataLocation.Distance(loc)
 	}
 	return float64(bid) / cost

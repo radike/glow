@@ -36,6 +36,7 @@ type AgentServerOption struct {
 	CPULevel     *int
 	CleanRestart *bool
 	CertFiles    netchan.CertFiles
+	Files        *string
 }
 
 type AgentServer struct {
@@ -116,6 +117,7 @@ func (as *AgentServer) Run() {
 		resource.AddToValues(values, as.computeResource, as.allocatedResource)
 		values.Add("dataCenter", *as.Option.DataCenter)
 		values.Add("rack", *as.Option.Rack)
+		values.Add("files", *as.Option.Files)
 	})
 
 	for {

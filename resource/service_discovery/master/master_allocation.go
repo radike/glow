@@ -40,6 +40,30 @@ func (tl *TeamMaster) allocateServersOnRack(dc *resource.DataCenter, rack *resou
 			}
 			request := requests[j]
 
+			if request.ComputeResource.Files != "" {
+				// pick agent with the specified resource
+				agentWithFileAllocated := false
+				for _, agentWithFile := range rack.GetAgents() {
+					available := agentWithFile.Resource.Minus(agentWithFile.Allocated)
+					if agentWithFile.Location.Files == request.ComputeResource.Files && available.GreaterThanZero() && available.Covers(request.ComputeResource) {
+						allocated = append(allocated, resource.Allocation{
+							Location:  agentWithFile.Location,
+							Allocated: request.ComputeResource,
+						})
+						agentWithFile.Allocated = agentWithFile.Allocated.Plus(request.ComputeResource)
+						rack.Allocated = rack.Allocated.Plus(request.ComputeResource)
+						dc.Allocated = dc.Allocated.Plus(request.ComputeResource)
+						tl.MasterResource.Topology.Allocated = tl.MasterResource.Topology.Allocated.Plus(request.ComputeResource)
+						available = available.Minus(request.ComputeResource)
+						agentWithFileAllocated = true
+						break
+					}
+				}
+				if !agentWithFileAllocated {
+					remainingRequests = append(remainingRequests, request)
+				}
+				continue
+			}
 			// fmt.Printf("available %v, requested %v\n", available, request.ComputeResource)
 			if available.Covers(request.ComputeResource) {
 				allocated = append(allocated, resource.Allocation{
@@ -67,7 +91,6 @@ func (tl *TeamMaster) findServers(dc *resource.DataCenter, req *resource.Allocat
 		racks = append(racks, rack)
 	}
 	sort.Sort(ByAvailableResources(racks))
-
 	requests := make([]*resource.ComputeRequest, 0, len(req.Requests))
 	for i := range req.Requests {
 		requests = append(requests, &req.Requests[i])

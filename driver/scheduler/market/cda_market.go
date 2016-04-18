@@ -107,7 +107,6 @@ func (m *Market) AddSupply(supply Supply) {
 }
 
 func (m *Market) pickBestSupplyFor(r Requirement) Supply {
-
 	scores := make([]float64, len(m.Supplies))
 	for i, supply := range m.Supplies {
 		scores[i] = m.ScoreFn(r, 1, supply.Object)
