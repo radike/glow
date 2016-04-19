@@ -58,14 +58,16 @@ func (fc *FlowContext) WithResources(f interface{}, resources []string) (ret *Da
 	step.Name = "WithResources"
 	step.Function = func(task *Task) {
 		ctype := reflect.ChanOf(reflect.BothDir, ret.Type)
-		outChan := reflect.MakeChan(ctype, 0)
+		outChan := reflect.MakeChan(ctype, len(resources))
 		fn := reflect.ValueOf(f)
 		var wg sync.WaitGroup
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
 			defer outChan.Close()
-			fn.Call([]reflect.Value{outChan})
+			for i := range resources {
+				fn.Call([]reflect.Value{reflect.ValueOf(resources[i]), outChan})
+			}
 		}()
 
 		wg.Add(1)
