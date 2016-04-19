@@ -70,7 +70,7 @@ type Location struct {
 type Allocation struct {
 	Location          Location        `json:"location,omitempty"`
 	Allocated         ComputeResource `json:"allocated,omitempty"`
-	ProvidedResources string          `json:"files,omitempty"`
+	ProvidedResources []string        `json:"files,omitempty"`
 }
 
 type AllocationRequest struct {

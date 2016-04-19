@@ -10,7 +10,7 @@ type AgentInformation struct {
 	LastHeartBeat      time.Time
 	Resource           ComputeResource
 	Allocated          ComputeResource
-	ArbitraryResources string
+	ArbitraryResources []string
 }
 
 type Rack struct {

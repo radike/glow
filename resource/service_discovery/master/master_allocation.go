@@ -66,11 +66,20 @@ func (tl *TeamMaster) allocateServersOnRack(dc *resource.DataCenter, rack *resou
 func getAgentWithRequiredResource(resource resource.ComputeResource, rack *resource.Rack) *resource.AgentInformation {
 	for _, agent := range rack.GetAgents() {
 		available := agent.Resource.Minus(agent.Allocated)
-		if available.GreaterThanZero() && agent.ArbitraryResources == resource.RequiredResource && available.Covers(resource) {
+		if available.GreaterThanZero() && containsStr(agent.ArbitraryResources, resource.RequiredResource) && available.Covers(resource) {
 			return agent
 		}
 	}
 	return nil
+}
+
+func containsStr(s []string, str string) bool {
+	for _, v := range s {
+		if v == str {
+			return true
+		}
+	}
+	return false
 }
 
 func (tl *TeamMaster) allocateRequest(request *resource.ComputeRequest, agent *resource.AgentInformation, rack *resource.Rack, dc *resource.DataCenter) resource.Allocation {

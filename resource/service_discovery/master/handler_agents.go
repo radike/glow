@@ -63,7 +63,7 @@ func (tl *TeamMaster) updateAgentHandler(w http.ResponseWriter, r *http.Request)
 		},
 		Resource:           res,
 		Allocated:          alloc,
-		ArbitraryResources: r.FormValue("resources"),
+		ArbitraryResources: strings.Split(r.FormValue("resources"), ","),
 	}
 
 	// fmt.Printf("reported allocated: %v\n", alloc)

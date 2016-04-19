@@ -17,10 +17,19 @@ func (s *Scheduler) Score(r market.Requirement, bid float64, obj market.Object) 
 			// log.Printf("Strange1: %s not allocated yet.", input.Name())
 			continue
 		}
-		if tg.RequiredResource != al.ProvidedResources {
+		if tg.RequiredResource != "" && !containsStr(al.ProvidedResources, tg.RequiredResource) {
 			cost += 10000
 		}
 		cost += dataLocation.Distance(loc)
 	}
 	return float64(bid) / cost
+}
+
+func containsStr(s []string, str string) bool {
+	for _, v := range s {
+		if v == str {
+			return true
+		}
+	}
+	return false
 }
